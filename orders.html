@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders - BiteRush</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="flex-between" style="padding: var(--spacing-md) 0;">
+                <a href="index.html" class="logo">
+                    <span style="font-size: 24px; font-weight: 700; color: var(--primary-color);">
+                        🍔 BiteRush
+                    </span>
+                </a>
+                
+                <div class="navbar-menu">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="restaurants.html" class="nav-link">Restaurants</a>
+                    <a href="restaurants.html" class="nav-link">Categories</a>
+                    <a href="restaurants.html" class="nav-link">Offers</a>
+                </div>
+                
+                <div class="flex-center gap-md">
+                    <a href="cart.html" class="btn btn-primary btn-sm position-relative">
+                        🛒
+                        <span class="cart-count badge badge-primary" style="position: absolute; top: -8px; right: -8px; display: none;">0</span>
+                    </a>
+                    
+                    <div class="auth-links flex-center gap-sm">
+                        <a href="login.html" class="btn btn-outline btn-sm">Login</a>
+                    </div>
+                    
+                    <div class="user-links flex-center gap-sm" style="display: none;">
+                        <span class="user-name text-secondary"></span>
+                        <button onclick="logout()" class="btn btn-outline btn-sm">Logout</button>
+                    </div>
+                    
+                    <button class="navbar-toggle" style="display: none; background: none; border: none; font-size: 24px; cursor: pointer;">
+                        ☰
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Orders Section -->
+    <section class="section">
+        <div class="container">
+            <h1>My Orders</h1>
+            
+            <!-- Orders List -->
+            <div id="orders-list">
+                <!-- Orders will be loaded here -->
+            </div>
+            
+            <!-- Empty State -->
+            <div id="empty-orders" class="empty-state hidden">
+                <div class="empty-state-icon">📦</div>
+                <h3 class="empty-state-title">No orders yet</h3>
+                <p class="empty-state-text">You haven't placed any orders. Start exploring delicious food!</p>
+                <a href="restaurants.html" class="btn btn-primary">Explore Restaurants</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Order Details Modal -->
+    <div id="order-modal" class="hidden" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: var(--z-modal); display: flex; align-items: center; justify-content: center; padding: var(--spacing-md);">
+        <div class="card" style="max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto;">
+            <div class="card-header flex-between">
+                <h3>Order Details</h3>
+                <button onclick="closeOrderModal()" class="btn btn-outline btn-sm" style="border: none; font-size: 20px;">×</button>
+            </div>
+            <div class="card-body" id="order-modal-content">
+                <!-- Order details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer" style="background-color: var(--bg-dark); color: white; padding: var(--spacing-xl) 0;">
+        <div class="container">
+            <div class="text-center">
+                <p style="color: rgba(255,255,255,0.5);">&copy; 2026 BiteRush. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        function initOrdersPage() {
+            renderOrders();
+            // Start order simulation for pending orders
+            startOrderSimulation();
+        }
+
+        function renderOrders() {
+            const orders = getOrders();
+            const ordersList = document.getElementById('orders-list');
+            const emptyOrders = document.getElementById('empty-orders');
+
+            if (orders.length === 0) {
+                ordersList.innerHTML = '';
+                emptyOrders.classList.remove('hidden');
+                return;
+            }
+
+            emptyOrders.classList.add('hidden');
+
+            ordersList.innerHTML = orders.map(order => `
+                <div class="card mb-lg">
+                    <div class="card-body">
+                        <div class="flex-between mb-md">
+                            <div>
+                                <h4 style="margin-bottom: var(--spacing-xs);">${order.id}</h4>
+                                <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin-bottom: 0;">
+                                    ${new Date(order.createdAt).toLocaleDateString('en-US', { 
+                                        year: 'numeric', 
+                                        month: 'short', 
+                                        day: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    })}
+                                </p>
+                            </div>
+                            <div class="text-right">
+                                <span class="price price-large">${formatPrice(order.total)}</span>
+                                <br>
+                                <span class="badge ${getStatusBadgeClass(order.status)}">${order.status}</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Order Items Preview -->
+                        <div class="mb-md">
+                            ${order.items.slice(0, 3).map(item => `
+                                <div class="flex-between" style="font-size: var(--font-size-sm); margin-bottom: var(--spacing-xs);">
+                                    <span>${item.quantity}x ${item.name}</span>
+                                    <span>${formatPrice(item.finalPrice * item.quantity)}</span>
+                                </div>
+                            `).join('')}
+                            ${order.items.length > 3 ? `<p style="font-size: var(--font-size-sm); color: var(--text-secondary);">+${order.items.length - 3} more items</p>` : ''}
+                        </div>
+                        
+                        <!-- Progress Tracker -->
+                        <div class="progress-tracker mb-md">
+                            ${renderProgressTracker(order.status)}
+                        </div>
+                        
+                        <div class="flex gap-sm">
+                            <button onclick="viewOrderDetails('${order.id}')" class="btn btn-outline btn-sm">View Details</button>
+                            <button onclick="reorderOrder('${order.id}')" class="btn btn-primary btn-sm">Reorder</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderProgressTracker(status) {
+            const statuses = ['Order Placed', 'Confirmed', 'Preparing', 'Out for Delivery', 'Delivered'];
+            const currentIndex = statuses.indexOf(status);
+            
+            return statuses.map((s, index) => {
+                let stepClass = '';
+                if (index < currentIndex) {
+                    stepClass = 'completed';
+                } else if (index === currentIndex) {
+                    stepClass = 'active';
+                }
+                
+                return `
+                    <div class="progress-step ${stepClass}">
+                        <div class="progress-step-icon">${index < currentIndex ? '✓' : index + 1}</div>
+                        <span class="progress-step-label">${s}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getStatusBadgeClass(status) {
+            switch(status) {
+                case 'Order Placed':
+                    return 'badge-primary';
+                case 'Confirmed':
+                    return 'badge-primary';
+                case 'Preparing':
+                    return 'badge-warning';
+                case 'Out for Delivery':
+                    return 'badge-warning';
+                case 'Delivered':
+                    return 'badge-success';
+                default:
+                    return 'badge-secondary';
+            }
+        }
+
+        function viewOrderDetails(orderId) {
+            const order = getOrderById(orderId);
+            if (!order) return;
+
+            const modal = document.getElementById('order-modal');
+            const content = document.getElementById('order-modal-content');
+
+            content.innerHTML = `
+                <div class="mb-lg">
+                    <h4 style="margin-bottom: var(--spacing-md);">${order.id}</h4>
+                    <p style="color: var(--text-secondary);">Placed on ${new Date(order.createdAt).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    })}</p>
+                    <span class="badge ${getStatusBadgeClass(order.status)}">${order.status}</span>
+                </div>
+                
+                <!-- Progress Tracker -->
+                <div class="progress-tracker mb-lg">
+                    ${renderProgressTracker(order.status)}
+                </div>
+                
+                <hr style="margin: var(--spacing-lg) 0; border: none; border-top: 1px solid var(--border-color);">
+                
+                <!-- Delivery Information -->
+                <div class="mb-lg">
+                    <h4 style="margin-bottom: var(--spacing-md);">Delivery Information</h4>
+                    <p><strong>Name:</strong> ${order.deliveryInfo.fullName}</p>
+                    <p><strong>Phone:</strong> ${order.deliveryInfo.phone}</p>
+                    <p><strong>Address:</strong> ${order.deliveryInfo.address}, ${order.deliveryInfo.city} ${order.deliveryInfo.postalCode}</p>
+                    ${order.deliveryInfo.deliveryInstructions ? `<p><strong>Instructions:</strong> ${order.deliveryInfo.deliveryInstructions}</p>` : ''}
+                </div>
+                
+                <hr style="margin: var(--spacing-lg) 0; border: none; border-top: 1px solid var(--border-color);">
+                
+                <!-- Order Items -->
+                <div class="mb-lg">
+                    <h4 style="margin-bottom: var(--spacing-md);">Order Items</h4>
+                    ${order.items.map(item => `
+                        <div class="flex-between mb-sm" style="padding: var(--spacing-sm) 0; border-bottom: 1px solid var(--border-color);">
+                            <div>
+                                <p style="margin-bottom: var(--spacing-xs);">${item.quantity}x ${item.name}</p>
+                                <p style="font-size: var(--font-size-sm); color: var(--text-secondary);">${item.restaurantName}</p>
+                                ${item.selectedOptions.size ? `<p style="font-size: var(--font-size-sm); color: var(--text-secondary);">Size: ${item.selectedOptions.size}</p>` : ''}
+                                ${item.selectedOptions.addOns && item.selectedOptions.addOns.length > 0 ? `<p style="font-size: var(--font-size-sm); color: var(--text-secondary);">Add-ons: ${item.selectedOptions.addOns.join(', ')}</p>` : ''}
+                            </div>
+                            <span class="price">${formatPrice(item.finalPrice * item.quantity)}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <hr style="margin: var(--spacing-lg) 0; border: none; border-top: 1px solid var(--border-color);">
+                
+                <!-- Payment Summary -->
+                <div>
+                    <h4 style="margin-bottom: var(--spacing-md);">Payment Summary</h4>
+                    <div class="flex-between mb-sm">
+                        <span>Subtotal</span>
+                        <span>${formatPrice(order.subtotal)}</span>
+                    </div>
+                    <div class="flex-between mb-sm">
+                        <span>Delivery Fee</span>
+                        <span>${formatPrice(order.deliveryFee)}</span>
+                    </div>
+                    <div class="flex-between mb-sm">
+                        <span>Service Fee</span>
+                        <span>${formatPrice(order.serviceFee)}</span>
+                    </div>
+                    <div class="flex-between mb-sm">
+                        <span>Tax</span>
+                        <span>${formatPrice(order.tax)}</span>
+                    </div>
+                    ${order.discount > 0 ? `
+                        <div class="flex-between mb-sm" style="color: var(--success-color);">
+                            <span>Discount</span>
+                            <span>-${formatPrice(order.discount)}</span>
+                        </div>
+                    ` : ''}
+                    <hr style="margin: var(--spacing-md) 0; border: none; border-top: 1px solid var(--border-color);">
+                    <div class="flex-between">
+                        <span style="font-weight: 700;">Total</span>
+                        <span class="price price-large">${formatPrice(order.total)}</span>
+                    </div>
+                    <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin-top: var(--spacing-sm);">
+                        Payment Method: ${order.paymentMethod === 'cod' ? 'Cash on Delivery' : order.paymentMethod === 'card' ? 'Credit/Debit Card' : 'Online Payment'}
+                    </p>
+                </div>
+                
+                <div class="flex gap-sm mt-lg">
+                    <button onclick="closeOrderModal()" class="btn btn-secondary btn-block">Close</button>
+                    <button onclick="reorderOrder('${order.id}'); closeOrderModal();" class="btn btn-primary btn-block">Reorder</button>
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeOrderModal() {
+            document.getElementById('order-modal').classList.add('hidden');
+        }
+
+        function reorderOrder(orderId) {
+            const order = getOrderById(orderId);
+            if (!order) return;
+
+            reorderItems(order.items);
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('order-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeOrderModal();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Details - BiteRush</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="flex-between" style="padding: var(--spacing-md) 0;">
+                <a href="index.html" class="logo">
+                    <span style="font-size: 24px; font-weight: 700; color: var(--primary-color);">
+                        🍔 BiteRush
+                    </span>
+                </a>
+                
+                <div class="navbar-menu">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="restaurants.html" class="nav-link">Restaurants</a>
+                    <a href="restaurants.html" class="nav-link">Categories</a>
+                    <a href="restaurants.html" class="nav-link">Offers</a>
+                </div>
+                
+                <div class="flex-center gap-md">
+                    <a href="cart.html" class="btn btn-primary btn-sm position-relative">
+                        🛒
+                        <span class="cart-count badge badge-primary" style="position: absolute; top: -8px; right: -8px; display: none;">0</span>
+                    </a>
+                    
+                    <div class="auth-links flex-center gap-sm">
+                        <a href="login.html" class="btn btn-outline btn-sm">Login</a>
+                    </div>
+                    
+                    <div class="user-links flex-center gap-sm" style="display: none;">
+                        <span class="user-name text-secondary"></span>
+                        <button onclick="logout()" class="btn btn-outline btn-sm">Logout</button>
+                    </div>
+                    
+                    <button class="navbar-toggle" style="display: none; background: none; border: none; font-size: 24px; cursor: pointer;">
+                        ☰
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Food Details Section -->
+    <section class="section">
+        <div class="container">
+            <div id="food-details-container">
+                <!-- Food details will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" style="background-color: var(--bg-dark); color: white; padding: var(--spacing-xl) 0;">
+        <div class="container">
+            <div class="text-center">
+                <p style="color: rgba(255,255,255,0.5);">&copy; 2026 BiteRush. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        let currentFood = null;
+        let currentRestaurant = null;
+        let selectedSize = null;
+        let selectedAddOns = [];
+        let quantity = 1;
+
+        function initFoodDetailsPage() {
+            const foodId = parseInt(getUrlParameter('id'));
+            
+            if (!foodId) {
+                window.location.href = 'restaurants.html';
+                return;
+            }
+
+            currentFood = foodItems.find(f => f.id === foodId);
+            
+            if (!currentFood) {
+                window.location.href = '404.html';
+                return;
+            }
+
+            currentRestaurant = restaurants.find(r => r.id === currentFood.restaurantId);
+            
+            // Initialize selections
+            selectedSize = currentFood.options.size[0];
+            selectedAddOns = [];
+            quantity = 1;
+
+            renderFoodDetails();
+            setupEventListeners();
+        }
+
+        function renderFoodDetails() {
+            const container = document.getElementById('food-details-container');
+            
+            container.innerHTML = `
+                <div class="grid grid-2" style="gap: var(--spacing-2xl);">
+                    <!-- Food Image -->
+                    <div>
+                        <img src="${currentFood.image}" alt="${currentFood.name}" style="width: 100%; height: 400px; object-fit: cover; border-radius: var(--border-radius-lg);">
+                    </div>
+                    
+                    <!-- Food Info -->
+                    <div>
+                        <a href="restaurant.html?id=${currentRestaurant.id}" style="color: var(--text-secondary); font-size: var(--font-size-sm);">${currentRestaurant ? currentRestaurant.name : ''}</a>
+                        <h1 style="margin-bottom: var(--spacing-md);">${currentFood.name}</h1>
+                        <p style="margin-bottom: var(--spacing-lg);">${currentFood.description}</p>
+                        
+                        <div class="rating mb-lg">
+                            <span>★</span>
+                            <span class="rating-value">${currentFood.rating}</span>
+                        </div>
+                        
+                        <div class="card mb-lg">
+                            <div class="card-body">
+                                <h4 style="margin-bottom: var(--spacing-md);">Ingredients</h4>
+                                <p style="margin-bottom: 0;">${currentFood.ingredients.join(', ')}</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Size Selection -->
+                        <div class="form-group">
+                            <label class="form-label">Size</label>
+                            <div class="flex gap-sm">
+                                ${currentFood.options.size.map((size, index) => `
+                                    <button class="btn size-btn ${index === 0 ? 'btn-primary' : 'btn-outline'}" 
+                                            data-size="${index}"
+                                            data-price="${size.price}">
+                                        ${size.name} ${size.price > 0 ? `(+${formatPrice(size.price)})` : ''}
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <!-- Add-ons -->
+                        <div class="form-group">
+                            <label class="form-label">Add-ons</label>
+                            <div class="flex gap-sm" style="flex-wrap: wrap;">
+                                ${currentFood.options.addOns.map((addOn, index) => `
+                                    <label class="flex-center gap-sm" style="cursor: pointer; padding: var(--spacing-sm) var(--spacing-md); border: 2px solid var(--border-color); border-radius: var(--border-radius-sm);">
+                                        <input type="checkbox" class="addon-checkbox" 
+                                               data-addon="${index}" 
+                                               data-price="${addOn.price}"
+                                               style="margin-right: var(--spacing-sm);">
+                                        ${addOn.name} (+${formatPrice(addOn.price)})
+                                    </label>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <!-- Quantity -->
+                        <div class="form-group">
+                            <label class="form-label">Quantity</label>
+                            <div class="quantity-selector">
+                                <button class="quantity-btn" onclick="updateQuantity(-1)">-</button>
+                                <span class="quantity-value">${quantity}</span>
+                                <button class="quantity-btn" onclick="updateQuantity(1)">+</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Special Instructions -->
+                        <div class="form-group">
+                            <label class="form-label">Special Instructions</label>
+                            <textarea id="special-instructions" class="form-control" placeholder="Any special requests? (optional)"></textarea>
+                        </div>
+                        
+                        <!-- Price and Add to Cart -->
+                        <div class="card" style="background: var(--bg-tertiary);">
+                            <div class="card-body">
+                                <div class="flex-between mb-md">
+                                    <span style="font-size: var(--font-size-lg);">Total:</span>
+                                    <span class="price price-large" id="total-price">${formatPrice(calculateTotal())}</span>
+                                </div>
+                                <button onclick="addToCartFromDetails()" class="btn btn-primary btn-block btn-lg">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function setupEventListeners() {
+            // Size buttons
+            document.querySelectorAll('.size-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.size-btn').forEach(b => {
+                        b.classList.remove('btn-primary');
+                        b.classList.add('btn-outline');
+                    });
+                    this.classList.remove('btn-outline');
+                    this.classList.add('btn-primary');
+                    
+                    selectedSize = currentFood.options.size[parseInt(this.dataset.size)];
+                    updateTotalPrice();
+                });
+            });
+
+            // Add-on checkboxes
+            document.querySelectorAll('.addon-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const addOnIndex = parseInt(this.dataset.addon);
+                    const addOn = currentFood.options.addOns[addOnIndex];
+                    
+                    if (this.checked) {
+                        selectedAddOns.push(addOn);
+                    } else {
+                        selectedAddOns = selectedAddOns.filter(a => a.name !== addOn.name);
+                    }
+                    
+                    updateTotalPrice();
+                });
+            });
+        }
+
+        function updateQuantity(change) {
+            quantity += change;
+            if (quantity < 1) quantity = 1;
+            if (quantity > 10) quantity = 10;
+            
+            document.querySelector('.quantity-value').textContent = quantity;
+            updateTotalPrice();
+        }
+
+        function calculateTotal() {
+            let total = currentFood.price;
+            
+            // Add size price
+            if (selectedSize && selectedSize.price > 0) {
+                total += selectedSize.price;
+            }
+            
+            // Add add-on prices
+            selectedAddOns.forEach(addOn => {
+                total += addOn.price;
+            });
+            
+            // Multiply by quantity
+            total *= quantity;
+            
+            return total;
+        }
+
+        function updateTotalPrice() {
+            document.getElementById('total-price').textContent = formatPrice(calculateTotal());
+        }
+
+        function addToCartFromDetails() {
+            const specialInstructions = document.getElementById('special-instructions').value;
+            
+            const cartItem = {
+                id: currentFood.id,
+                name: currentFood.name,
+                restaurantId: currentFood.restaurantId,
+                restaurantName: currentRestaurant ? currentRestaurant.name : '',
+                image: currentFood.image,
+                price: currentFood.price,
+                finalPrice: calculateTotal() / quantity,
+                quantity: quantity,
+                selectedOptions: {
+                    size: selectedSize.name,
+                    addOns: selectedAddOns.map(a => a.name),
+                    specialInstructions: specialInstructions
+                }
+            };
+
+            addToCart(cartItem);
+        }
+    </script>
+</body>
+</html>

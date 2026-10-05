@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurants - BiteRush</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="flex-between" style="padding: var(--spacing-md) 0;">
+                <a href="index.html" class="logo">
+                    <span style="font-size: 24px; font-weight: 700; color: var(--primary-color);">
+                        🍔 BiteRush
+                    </span>
+                </a>
+                
+                <div class="navbar-menu">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="restaurants.html" class="nav-link">Restaurants</a>
+                    <a href="restaurants.html" class="nav-link">Categories</a>
+                    <a href="restaurants.html" class="nav-link">Offers</a>
+                </div>
+                
+                <div class="flex-center gap-md">
+                    <div class="search-box">
+                        <input type="text" id="search-input" placeholder="Search restaurants..." class="form-control" style="width: 200px; padding: var(--spacing-sm) var(--spacing-md);">
+                    </div>
+                    
+                    <a href="cart.html" class="btn btn-primary btn-sm position-relative">
+                        🛒
+                        <span class="cart-count badge badge-primary" style="position: absolute; top: -8px; right: -8px; display: none;">0</span>
+                    </a>
+                    
+                    <div class="auth-links flex-center gap-sm">
+                        <a href="login.html" class="btn btn-outline btn-sm">Login</a>
+                    </div>
+                    
+                    <div class="user-links flex-center gap-sm" style="display: none;">
+                        <span class="user-name text-secondary"></span>
+                        <button onclick="logout()" class="btn btn-outline btn-sm">Logout</button>
+                    </div>
+                    
+                    <button class="navbar-toggle" style="display: none; background: none; border: none; font-size: 24px; cursor: pointer;">
+                        ☰
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Section -->
+    <section class="section" style="background: linear-gradient(135deg, #ff6b35 0%, #ff8c5a 100%); color: white; padding: var(--spacing-xl) 0;">
+        <div class="container">
+            <div class="text-center">
+                <h1 style="color: white;">Discover restaurants near you</h1>
+                <p style="color: rgba(255,255,255,0.9);">Find the best food from top restaurants</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Search and Filters -->
+    <section class="section">
+        <div class="container">
+            <div class="card">
+                <div class="card-body">
+                    <div class="flex-between" style="flex-wrap: wrap; gap: var(--spacing-md);">
+                        <!-- Search -->
+                        <div style="flex: 1; min-width: 250px;">
+                            <input type="text" id="main-search" placeholder="Search by name, cuisine, or category..." class="form-control">
+                        </div>
+                        
+                        <!-- Filters -->
+                        <div class="flex gap-sm" style="flex-wrap: wrap;">
+                            <select id="cuisine-filter" class="form-control" style="width: auto;">
+                                <option value="">All Cuisines</option>
+                                <option value="Pakistani">Pakistani</option>
+                                <option value="Chinese">Chinese</option>
+                                <option value="Italian">Italian</option>
+                                <option value="Mexican">Mexican</option>
+                                <option value="Fast Food">Fast Food</option>
+                                <option value="BBQ">BBQ</option>
+                                <option value="Desserts">Desserts</option>
+                                <option value="Coffee">Coffee</option>
+                            </select>
+                            
+                            <select id="rating-filter" class="form-control" style="width: auto;">
+                                <option value="">All Ratings</option>
+                                <option value="4.5">4.5+</option>
+                                <option value="4.0">4.0+</option>
+                                <option value="3.5">3.5+</option>
+                            </select>
+                            
+                            <select id="delivery-filter" class="form-control" style="width: auto;">
+                                <option value="">All Delivery Times</option>
+                                <option value="20">Under 20 min</option>
+                                <option value="30">Under 30 min</option>
+                                <option value="45">Under 45 min</option>
+                            </select>
+                            
+                            <select id="price-filter" class="form-control" style="width: auto;">
+                                <option value="">All Prices</option>
+                                <option value="$">$</option>
+                                <option value="$$">$$</option>
+                                <option value="$$$">$$$</option>
+                            </select>
+                            
+                            <select id="sort-filter" class="form-control" style="width: auto;">
+                                <option value="recommended">Recommended</option>
+                                <option value="rating">Highest Rated</option>
+                                <option value="delivery">Fastest Delivery</option>
+                                <option value="fee">Lowest Delivery Fee</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results -->
+    <section class="section">
+        <div class="container">
+            <div class="flex-between mb-lg">
+                <h3 id="results-count">Showing all restaurants</h3>
+                <button onclick="resetFilters()" class="btn btn-outline btn-sm">Reset Filters</button>
+            </div>
+            
+            <div class="restaurants-grid grid grid-4" id="restaurants-grid">
+                <!-- Restaurants will be loaded here -->
+            </div>
+            
+            <!-- Empty State -->
+            <div id="empty-state" class="empty-state hidden">
+                <div class="empty-state-icon">🔍</div>
+                <h3 class="empty-state-title">No restaurants found</h3>
+                <p class="empty-state-text">Try adjusting your filters or search terms</p>
+                <button onclick="resetFilters()" class="btn btn-primary">Reset Filters</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" style="background-color: var(--bg-dark); color: white; padding: var(--spacing-xl) 0;">
+        <div class="container">
+            <div class="text-center">
+                <p style="color: rgba(255,255,255,0.5);">&copy; 2026 BiteRush. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        let filteredRestaurants = [...restaurants];
+
+        function initRestaurantsPage() {
+            // Check for category filter from URL
+            const categoryParam = getUrlParameter('category');
+            if (categoryParam) {
+                document.getElementById('main-search').value = categoryParam;
+            }
+            
+            // Add event listeners
+            document.getElementById('main-search').addEventListener('input', filterRestaurants);
+            document.getElementById('cuisine-filter').addEventListener('change', filterRestaurants);
+            document.getElementById('rating-filter').addEventListener('change', filterRestaurants);
+            document.getElementById('delivery-filter').addEventListener('change', filterRestaurants);
+            document.getElementById('price-filter').addEventListener('change', filterRestaurants);
+            document.getElementById('sort-filter').addEventListener('change', filterRestaurants);
+            
+            // Initial render
+            filterRestaurants();
+        }
+
+        function filterRestaurants() {
+            const searchTerm = document.getElementById('main-search').value.toLowerCase();
+            const cuisineFilter = document.getElementById('cuisine-filter').value;
+            const ratingFilter = parseFloat(document.getElementById('rating-filter').value) || 0;
+            const deliveryFilter = parseInt(document.getElementById('delivery-filter').value) || 0;
+            const priceFilter = document.getElementById('price-filter').value;
+            const sortFilter = document.getElementById('sort-filter').value;
+
+            filteredRestaurants = restaurants.filter(restaurant => {
+                // Search filter
+                const matchesSearch = !searchTerm || 
+                    restaurant.name.toLowerCase().includes(searchTerm) ||
+                    restaurant.cuisine.toLowerCase().includes(searchTerm) ||
+                    restaurant.category.toLowerCase().includes(searchTerm);
+
+                // Cuisine filter
+                const matchesCuisine = !cuisineFilter || restaurant.cuisine === cuisineFilter;
+
+                // Rating filter
+                const matchesRating = restaurant.rating >= ratingFilter;
+
+                // Delivery time filter
+                const deliveryMinutes = parseInt(restaurant.deliveryTime.split('-')[0]) || 0;
+                const matchesDelivery = !deliveryFilter || deliveryMinutes <= deliveryFilter;
+
+                // Price filter
+                const matchesPrice = !priceFilter || restaurant.priceRange === priceFilter;
+
+                return matchesSearch && matchesCuisine && matchesRating && matchesDelivery && matchesPrice;
+            });
+
+            // Sort
+            switch(sortFilter) {
+                case 'rating':
+                    filteredRestaurants.sort((a, b) => b.rating - a.rating);
+                    break;
+                case 'delivery':
+                    filteredRestaurants.sort((a, b) => {
+                        const aMin = parseInt(a.deliveryTime.split('-')[0]) || 0;
+                        const bMin = parseInt(b.deliveryTime.split('-')[0]) || 0;
+                        return aMin - bMin;
+                    });
+                    break;
+                case 'fee':
+                    filteredRestaurants.sort((a, b) => a.deliveryFee - b.deliveryFee);
+                    break;
+                default:
+                    // Recommended - sort by rating and reviews
+                    filteredRestaurants.sort((a, b) => (b.rating * b.reviews) - (a.rating * a.reviews));
+            }
+
+            renderRestaurants();
+        }
+
+        function renderRestaurants() {
+            const grid = document.getElementById('restaurants-grid');
+            const emptyState = document.getElementById('empty-state');
+            const resultsCount = document.getElementById('results-count');
+
+            if (filteredRestaurants.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                resultsCount.textContent = 'No restaurants found';
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            resultsCount.textContent = `Showing ${filteredRestaurants.length} restaurant${filteredRestaurants.length !== 1 ? 's' : ''}`;
+
+            grid.innerHTML = filteredRestaurants.map(restaurant => `
+                <div class="card">
+                    <div style="position: relative;">
+                        <img src="${restaurant.image}" alt="${restaurant.name}" style="width: 100%; height: 200px; object-fit: cover;">
+                        <button class="btn-favorite ${isFavorite(restaurant.id) ? 'active' : ''}" 
+                                onclick="event.preventDefault(); toggleFavorite(${restaurant.id}); this.classList.toggle('active');"
+                                style="position: absolute; top: var(--spacing-md); right: var(--spacing-md); background: white; border-radius: 50%; width: 40px; height: 40px;">
+                            ${isFavorite(restaurant.id) ? '♥' : '♡'}
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <h3 style="margin-bottom: var(--spacing-sm);">${restaurant.name}</h3>
+                        <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin-bottom: var(--spacing-md);">${restaurant.cuisine}</p>
+                        <div class="flex-between" style="margin-bottom: var(--spacing-sm);">
+                            <div class="rating">
+                                <span>★</span>
+                                <span class="rating-value">${restaurant.rating} (${restaurant.reviews})</span>
+                            </div>
+                            <span style="font-size: var(--font-size-sm); color: var(--text-secondary);">${restaurant.deliveryTime} min</span>
+                        </div>
+                        <div class="flex-between">
+                            <span class="price">${formatPrice(restaurant.deliveryFee)} delivery</span>
+                            <a href="restaurant.html?id=${restaurant.id}" class="btn btn-primary btn-sm">View Menu</a>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function resetFilters() {
+            document.getElementById('main-search').value = '';
+            document.getElementById('cuisine-filter').value = '';
+            document.getElementById('rating-filter').value = '';
+            document.getElementById('delivery-filter').value = '';
+            document.getElementById('price-filter').value = '';
+            document.getElementById('sort-filter').value = 'recommended';
+            filterRestaurants();
+        }
+    </script>
+</body>
+</html>

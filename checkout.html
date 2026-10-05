@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - BiteRush</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+   
+    <nav class="navbar">
+        <div class="container">
+            <div class="flex-between" style="padding: var(--spacing-md) 0;">
+                <a href="index.html" class="logo">
+                    <span style="font-size: 24px; font-weight: 700; color: var(--primary-color);">
+                        🍔 BiteRush
+                    </span>
+                </a>
+                
+                <div class="navbar-menu">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="restaurants.html" class="nav-link">Restaurants</a>
+                    <a href="restaurants.html" class="nav-link">Categories</a>
+                    <a href="restaurants.html" class="nav-link">Offers</a>
+                </div>
+                
+                <div class="flex-center gap-md">
+                    <a href="cart.html" class="btn btn-primary btn-sm position-relative">
+                        🛒
+                        <span class="cart-count badge badge-primary" style="position: absolute; top: -8px; right: -8px; display: none;">0</span>
+                    </a>
+                    
+                    <div class="auth-links flex-center gap-sm">
+                        <a href="login.html" class="btn btn-outline btn-sm">Login</a>
+                    </div>
+                    
+                    <div class="user-links flex-center gap-sm" style="display: none;">
+                        <span class="user-name text-secondary"></span>
+                        <button onclick="logout()" class="btn btn-outline btn-sm">Logout</button>
+                    </div>
+                    
+                    <button class="navbar-toggle" style="display: none; background: none; border: none; font-size: 24px; cursor: pointer;">
+                        ☰
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+  
+    <section class="section">
+        <div class="container">
+            <h1>Checkout</h1>
+            
+            
+            <div class="grid grid-2" style="gap: var(--spacing-xl);">
+               
+                <div>
+                    <div class="card mb-lg">
+                        <div class="card-header">
+                            <h3>Delivery Information</h3>
+                        </div>
+                        <div class="card-body">
+                            <form id="checkout-form">
+                                <div class="form-group">
+                                    <label class="form-label" for="full-name">Full Name *</label>
+                                    <input type="text" id="full-name" class="form-control" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label" for="phone">Phone Number *</label>
+                                    <input type="tel" id="phone" class="form-control" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label" for="address">Address *</label>
+                                    <input type="text" id="address" class="form-control" required>
+                                </div>
+                                
+                                <div class="grid grid-2" style="gap: var(--spacing-md);">
+                                    <div class="form-group">
+                                        <label class="form-label" for="city">City *</label>
+                                        <input type="text" id="city" class="form-control" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="postal-code">Postal Code *</label>
+                                        <input type="text" id="postal-code" class="form-control" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label" for="delivery-instructions">Delivery Instructions</label>
+                                    <textarea id="delivery-instructions" class="form-control" placeholder="Apartment number, gate code, etc."></textarea>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                   
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Payment Method</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label class="form-label">Select Payment Method *</label>
+                                <div class="flex flex-column gap-sm">
+                                    <label class="flex-center gap-sm" style="cursor: pointer; padding: var(--spacing-md); border: 2px solid var(--border-color); border-radius: var(--border-radius);">
+                                        <input type="radio" name="payment-method" value="cod" checked>
+                                        <span>💵 Cash on Delivery</span>
+                                    </label>
+                                    <label class="flex-center gap-sm" style="cursor: pointer; padding: var(--spacing-md); border: 2px solid var(--border-color); border-radius: var(--border-radius);">
+                                        <input type="radio" name="payment-method" value="card">
+                                        <span>💳 Credit/Debit Card</span>
+                                    </label>
+                                    <label class="flex-center gap-sm" style="cursor: pointer; padding: var(--spacing-md); border: 2px solid var(--border-color); border-radius: var(--border-radius);">
+                                        <input type="radio" name="payment-method" value="online">
+                                        <span>📱 Online Payment</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                       
+                            <div id="card-payment-form" class="hidden" style="margin-top: var(--spacing-lg); padding-top: var(--spacing-lg); border-top: 1px solid var(--border-color);">
+                                <div class="form-group">
+                                    <label class="form-label" for="card-number">Card Number</label>
+                                    <input type="text" id="card-number" class="form-control" placeholder="1234 5678 9012 3456">
+                                </div>
+                                <div class="grid grid-2" style="gap: var(--spacing-md);">
+                                    <div class="form-group">
+                                        <label class="form-label" for="expiry">Expiry Date</label>
+                                        <input type="text" id="expiry" class="form-control" placeholder="MM/YY">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="cvv">CVV</label>
+                                        <input type="text" id="cvv" class="form-control" placeholder="123">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                
+                <div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Order Summary</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="checkout-items">
+                               
+                            </div>
+                            
+                            <hr style="margin: var(--spacing-lg) 0; border: none; border-top: 1px solid var(--border-color);">
+                            
+                            <div class="flex-between mb-sm">
+                                <span>Subtotal</span>
+                                <span id="checkout-subtotal">$0.00</span>
+                            </div>
+                            <div class="flex-between mb-sm">
+                                <span>Delivery Fee</span>
+                                <span id="checkout-delivery-fee">$0.00</span>
+                            </div>
+                            <div class="flex-between mb-sm">
+                                <span>Service Fee</span>
+                                <span id="checkout-service-fee">$0.00</span>
+                            </div>
+                            <div class="flex-between mb-sm">
+                                <span>Tax</span>
+                                <span id="checkout-tax">$0.00</span>
+                            </div>
+                            <div class="flex-between mb-sm" id="checkout-discount-row" style="display: none; color: var(--success-color);">
+                                <span>Discount</span>
+                                <span id="checkout-discount">-$0.00</span>
+                            </div>
+                            <hr style="margin: var(--spacing-md) 0; border: none; border-top: 1px solid var(--border-color);">
+                            <div class="flex-between mb-lg">
+                                <span style="font-size: var(--font-size-lg); font-weight: 700;">Total</span>
+                                <span class="price price-large" id="checkout-total">$0.00</span>
+                            </div>
+                            
+                            <button onclick="placeOrder()" class="btn btn-primary btn-block btn-lg">Place Order</button>
+                            
+                            <p style="font-size: var(--font-size-sm); color: var(--text-secondary); text-align: center; margin-top: var(--spacing-md);">
+                                By placing this order, you agree to our Terms of Service
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <footer class="footer" style="background-color: var(--bg-dark); color: white; padding: var(--spacing-xl) 0;">
+        <div class="container">
+            <div class="text-center">
+                <p style="color: rgba(255,255,255,0.5);">&copy; 2026 BiteRush. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        function initCheckoutPage() {
+            
+            const cart = getCart();
+            if (cart.length === 0) {
+                window.location.href = 'cart.html';
+                return;
+            }
+
+           
+            const user = getCurrentUser();
+            if (user) {
+                document.getElementById('full-name').value = user.name || '';
+            }
+
+           
+            const savedCoupon = getFromLocalStorage('biterush_applied_coupon', null);
+            if (savedCoupon) {
+                appliedCoupon = savedCoupon;
+            }
+
+            renderCheckoutSummary();
+            setupPaymentMethodToggle();
+        }
+
+        function renderCheckoutSummary() {
+            const cart = getCart();
+            const itemsContainer = document.getElementById('checkout-items');
+
+            const groupedItems = {};
+            cart.forEach(item => {
+                if (!groupedItems[item.restaurantId]) {
+                    groupedItems[item.restaurantId] = {
+                        restaurantName: item.restaurantName,
+                        items: []
+                    };
+                }
+                groupedItems[item.restaurantId].items.push(item);
+            });
+
+            itemsContainer.innerHTML = Object.values(groupedItems).map(group => `
+                <div class="mb-lg">
+                    <h4 style="margin-bottom: var(--spacing-sm);">${group.restaurantName}</h4>
+                    ${group.items.map(item => `
+                        <div class="flex-between mb-sm" style="font-size: var(--font-size-sm);">
+                            <span>${item.quantity}x ${item.name}</span>
+                            <span>${formatPrice(item.finalPrice * item.quantity)}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `).join('');
+
+           
+            const subtotal = cart.reduce((total, item) => total + (item.finalPrice * item.quantity), 0);
+            
+            const restaurantIds = [...new Set(cart.map(item => item.restaurantId))];
+            let deliveryFee = 0;
+            restaurantIds.forEach(id => {
+                const restaurant = restaurants.find(r => r.id === id);
+                if (restaurant) {
+                    deliveryFee += restaurant.deliveryFee;
+                }
+            });
+            
+            const serviceFee = subtotal * 0.05;
+            const tax = subtotal * 0.08;
+            
+            let discount = 0;
+            if (appliedCoupon) {
+                if (appliedCoupon.type === 'percentage') {
+                    discount = subtotal * (appliedCoupon.value / 100);
+                } else if (appliedCoupon.type === 'fixed') {
+                    discount = appliedCoupon.value;
+                }
+            }
+            
+            const total = subtotal + deliveryFee + serviceFee + tax - discount;
+
+            document.getElementById('checkout-subtotal').textContent = formatPrice(subtotal);
+            document.getElementById('checkout-delivery-fee').textContent = formatPrice(deliveryFee);
+            document.getElementById('checkout-service-fee').textContent = formatPrice(serviceFee);
+            document.getElementById('checkout-tax').textContent = formatPrice(tax);
+            
+            const discountRow = document.getElementById('checkout-discount-row');
+            if (discount > 0) {
+                discountRow.style.display = 'flex';
+                document.getElementById('checkout-discount').textContent = '-' + formatPrice(discount);
+            } else {
+                discountRow.style.display = 'none';
+            }
+            
+            document.getElementById('checkout-total').textContent = formatPrice(total);
+        }
+
+        function setupPaymentMethodToggle() {
+            const paymentMethods = document.querySelectorAll('input[name="payment-method"]');
+            const cardForm = document.getElementById('card-payment-form');
+
+            paymentMethods.forEach(method => {
+                method.addEventListener('change', function() {
+                    if (this.value === 'card') {
+                        cardForm.classList.remove('hidden');
+                    } else {
+                        cardForm.classList.add('hidden');
+                    }
+                });
+            });
+        }
+
+        function placeOrder() {
+            // Validate form
+            const fullName = document.getElementById('full-name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const address = document.getElementById('address').value.trim();
+            const city = document.getElementById('city').value.trim();
+            const postalCode = document.getElementById('postal-code').value.trim();
+
+            if (!fullName || !phone || !address || !city || !postalCode) {
+                showToast('Please fill in all required fields', 'error');
+                return;
+            }
+
+            // Validate phone number (basic)
+            if (phone.length < 10) {
+                showToast('Please enter a valid phone number', 'error');
+                return;
+            }
+
+            // Get payment method
+            const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
+
+            // If card payment, validate card fields
+            if (paymentMethod === 'card') {
+                const cardNumber = document.getElementById('card-number').value.trim();
+                const expiry = document.getElementById('expiry').value.trim();
+                const cvv = document.getElementById('cvv').value.trim();
+
+                if (!cardNumber || !expiry || !cvv) {
+                    showToast('Please fill in card details', 'error');
+                    return;
+                }
+            }
+
+            // Create order
+            const cart = getCart();
+            const subtotal = cart.reduce((total, item) => total + (item.finalPrice * item.quantity), 0);
+            
+            const restaurantIds = [...new Set(cart.map(item => item.restaurantId))];
+            let deliveryFee = 0;
+            restaurantIds.forEach(id => {
+                const restaurant = restaurants.find(r => r.id === id);
+                if (restaurant) {
+                    deliveryFee += restaurant.deliveryFee;
+                }
+            });
+            
+            const serviceFee = subtotal * 0.05;
+            const tax = subtotal * 0.08;
+            
+            let discount = 0;
+            if (appliedCoupon) {
+                if (appliedCoupon.type === 'percentage') {
+                    discount = subtotal * (appliedCoupon.value / 100);
+                } else if (appliedCoupon.type === 'fixed') {
+                    discount = appliedCoupon.value;
+                }
+            }
+            
+            const total = subtotal + deliveryFee + serviceFee + tax - discount;
+
+            const order = {
+                id: generateOrderId(),
+                userId: getCurrentUser()?.id || null,
+                items: cart,
+                deliveryInfo: {
+                    fullName,
+                    phone,
+                    address,
+                    city,
+                    postalCode,
+                    deliveryInstructions: document.getElementById('delivery-instructions').value.trim()
+                },
+                paymentMethod,
+                subtotal,
+                deliveryFee,
+                serviceFee,
+                tax,
+                discount,
+                total,
+                status: 'Order Placed',
+                createdAt: new Date().toISOString()
+            };
+
+            // Save order
+            saveOrder(order);
+
+            // Clear cart
+            clearCart();
+            removeFromLocalStorage('biterush_applied_coupon');
+
+            // Show success message
+            showToast('Order placed successfully!', 'success');
+
+            // Redirect to orders page
+            setTimeout(() => {
+                window.location.href = 'orders.html';
+            }, 1500);
+        }
+    </script>
+</body>
+</html>

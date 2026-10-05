@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Details - BiteRush</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="flex-between" style="padding: var(--spacing-md) 0;">
+                <a href="index.html" class="logo">
+                    <span style="font-size: 24px; font-weight: 700; color: var(--primary-color);">
+                        🍔 BiteRush
+                    </span>
+                </a>
+                
+                <div class="navbar-menu">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="restaurants.html" class="nav-link">Restaurants</a>
+                    <a href="restaurants.html" class="nav-link">Categories</a>
+                    <a href="restaurants.html" class="nav-link">Offers</a>
+                </div>
+                
+                <div class="flex-center gap-md">
+                    <a href="cart.html" class="btn btn-primary btn-sm position-relative">
+                        🛒
+                        <span class="cart-count badge badge-primary" style="position: absolute; top: -8px; right: -8px; display: none;">0</span>
+                    </a>
+                    
+                    <div class="auth-links flex-center gap-sm">
+                        <a href="login.html" class="btn btn-outline btn-sm">Login</a>
+                    </div>
+                    
+                    <div class="user-links flex-center gap-sm" style="display: none;">
+                        <span class="user-name text-secondary"></span>
+                        <button onclick="logout()" class="btn btn-outline btn-sm">Logout</button>
+                    </div>
+                    
+                    <button class="navbar-toggle" style="display: none; background: none; border: none; font-size: 24px; cursor: pointer;">
+                        ☰
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Restaurant Header -->
+    <section class="section" style="padding: 0;">
+        <div id="restaurant-header">
+            <!-- Restaurant header will be loaded here -->
+        </div>
+    </section>
+
+    <!-- Menu Section -->
+    <section class="section">
+        <div class="container">
+            <!-- Menu Categories Tabs -->
+            <div class="menu-tabs flex gap-sm mb-lg" style="overflow-x: auto; padding-bottom: var(--spacing-sm);">
+                <button class="btn btn-primary btn-sm menu-tab active" data-category="all">All</button>
+                <button class="btn btn-outline btn-sm menu-tab" data-category="Popular">Popular</button>
+                <button class="btn btn-outline btn-sm menu-tab" data-category="Starters">Starters</button>
+                <button class="btn btn-outline btn-sm menu-tab" data-category="Burgers">Burgers</button>
+                <button class="btn btn-outline btn-sm menu-tab" data-category="Pizza">Pizza</button>
+                <button class="btn btn-outline btn-sm menu-tab" data-category="Main Course">Main Course</button>
+                <button class="btn btn-outline btn-sm menu-tab" data-category="Drinks">Drinks</button>
+                <button class="btn btn-outline btn-sm menu-tab" data-category="Desserts">Desserts</button>
+            </div>
+
+            <!-- Menu Items -->
+            <div class="menu-grid grid grid-3" id="menu-grid">
+                <!-- Menu items will be loaded here -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="menu-empty-state" class="empty-state hidden">
+                <div class="empty-state-icon">🍽️</div>
+                <h3 class="empty-state-title">No items found</h3>
+                <p class="empty-state-text">Try selecting a different category</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" style="background-color: var(--bg-dark); color: white; padding: var(--spacing-xl) 0;">
+        <div class="container">
+            <div class="text-center">
+                <p style="color: rgba(255,255,255,0.5);">&copy; 2026 BiteRush. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        let currentRestaurant = null;
+        let currentCategory = 'all';
+
+        function initRestaurantPage() {
+            const restaurantId = parseInt(getUrlParameter('id'));
+            
+            if (!restaurantId) {
+                window.location.href = 'restaurants.html';
+                return;
+            }
+
+            currentRestaurant = restaurants.find(r => r.id === restaurantId);
+            
+            if (!currentRestaurant) {
+                window.location.href = '404.html';
+                return;
+            }
+
+            renderRestaurantHeader();
+            renderMenu();
+            setupMenuTabs();
+        }
+
+        function renderRestaurantHeader() {
+            const header = document.getElementById('restaurant-header');
+            
+            header.innerHTML = `
+                <div style="position: relative;">
+                    <img src="${currentRestaurant.image}" alt="${currentRestaurant.name}" style="width: 100%; height: 300px; object-fit: cover;">
+                </div>
+                <div class="container" style="margin-top: -60px; position: relative; z-index: 10;">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="flex-between" style="align-items: flex-start;">
+                                <div>
+                                    <h1 style="margin-bottom: var(--spacing-sm);">${currentRestaurant.name}</h1>
+                                    <p style="color: var(--text-secondary); margin-bottom: var(--spacing-md);">${currentRestaurant.description}</p>
+                                    <div class="flex gap-sm" style="margin-bottom: var(--spacing-md);">
+                                        <span class="badge badge-primary">${currentRestaurant.cuisine}</span>
+                                        <span class="badge badge-secondary">${currentRestaurant.priceRange}</span>
+                                    </div>
+                                </div>
+                                <button class="btn-favorite ${isFavorite(currentRestaurant.id) ? 'active' : ''}" 
+                                        onclick="toggleFavorite(${currentRestaurant.id}); this.classList.toggle('active');"
+                                        style="font-size: 32px;">
+                                    ${isFavorite(currentRestaurant.id) ? '♥' : '♡'}
+                                </button>
+                            </div>
+                            <div class="flex-between" style="flex-wrap: wrap; gap: var(--spacing-md);">
+                                <div class="flex gap-md">
+                                    <div class="rating">
+                                        <span>★</span>
+                                        <span class="rating-value">${currentRestaurant.rating} (${currentRestaurant.reviews} reviews)</span>
+                                    </div>
+                                    <span>🕐 ${currentRestaurant.deliveryTime} min</span>
+                                    <span>🚚 ${formatPrice(currentRestaurant.deliveryFee)} delivery</span>
+                                </div>
+                                <span style="color: var(--text-secondary);">📅 ${currentRestaurant.openingHours}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderMenu() {
+            const grid = document.getElementById('menu-grid');
+            const emptyState = document.getElementById('menu-empty-state');
+            
+            // Get menu items for this restaurant
+            const menuItems = foodItems.filter(item => item.restaurantId === currentRestaurant.id);
+            
+            // Filter by category
+            const filteredItems = currentCategory === 'all' 
+                ? menuItems 
+                : menuItems.filter(item => item.category === currentCategory);
+
+            if (filteredItems.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            grid.innerHTML = filteredItems.map(food => `
+                <div class="card">
+                    <a href="food-details.html?id=${food.id}" style="text-decoration: none; display: block;">
+                        <img src="${food.image}" alt="${food.name}" style="width: 100%; height: 200px; object-fit: cover;">
+                    </a>
+                    <div class="card-body">
+                        <h4 style="margin-bottom: var(--spacing-xs);">${food.name}</h4>
+                        <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin-bottom: var(--spacing-sm); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${food.description}</p>
+                        <div class="rating" style="margin-bottom: var(--spacing-sm);">
+                            <span>★</span>
+                            <span class="rating-value">${food.rating}</span>
+                        </div>
+                        <div class="flex-between">
+                            <span class="price">${formatPrice(food.price)}</span>
+                            <button onclick="event.preventDefault(); quickAddToCart(${food.id})" class="btn btn-primary btn-sm">Add</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function setupMenuTabs() {
+            const tabs = document.querySelectorAll('.menu-tab');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Update active state
+                    tabs.forEach(t => {
+                        t.classList.remove('btn-primary');
+                        t.classList.add('btn-outline');
+                    });
+                    this.classList.remove('btn-outline');
+                    this.classList.add('btn-primary');
+                    
+                    // Update category and re-render
+                    currentCategory = this.dataset.category;
+                    renderMenu();
+                });
+            });
+        }
+
+        function quickAddToCart(foodId) {
+            const food = foodItems.find(f => f.id === foodId);
+            if (!food) return;
+
+            const cartItem = {
+                id: food.id,
+                name: food.name,
+                restaurantId: food.restaurantId,
+                restaurantName: currentRestaurant.name,
+                image: food.image,
+                price: food.price,
+                finalPrice: food.price,
+                quantity: 1,
+                selectedOptions: {
+                    size: food.options.size[0].name,
+                    addOns: []
+                }
+            };
+
+            addToCart(cartItem);
+        }
+    </script>
+</body>
+</html>

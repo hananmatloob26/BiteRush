@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BiteRush - Your cravings. Delivered fast.</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="flex-between" style="padding: var(--spacing-md) 0;">
+                <!-- Logo -->
+                <a href="index.html" class="logo">
+                    <span style="font-size: 24px; font-weight: 700; color: var(--primary-color);">
+                        🍔 BiteRush
+                    </span>
+                </a>
+                
+                <!-- Desktop Navigation -->
+                <div class="navbar-menu">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="restaurants.html" class="nav-link">Restaurants</a>
+                    <a href="restaurants.html" class="nav-link">Categories</a>
+                    <a href="restaurants.html" class="nav-link">Offers</a>
+                </div>
+                
+                <!-- Right Side -->
+                <div class="flex-center gap-md">
+                    <!-- Search -->
+                    <div class="search-box">
+                        <input type="text" placeholder="Search restaurants..." class="form-control" style="width: 200px; padding: var(--spacing-sm) var(--spacing-md);">
+                    </div>
+                    
+                    <!-- Cart -->
+                    <a href="cart.html" class="btn btn-primary btn-sm position-relative">
+                        🛒
+                        <span class="cart-count badge badge-primary" style="position: absolute; top: -8px; right: -8px; display: none;">0</span>
+                    </a>
+                    
+                    <!-- Auth Links (shown when not logged in) -->
+                    <div class="auth-links flex-center gap-sm">
+                        <a href="login.html" class="btn btn-outline btn-sm">Login</a>
+                    </div>
+                    
+                    <!-- User Links (shown when logged in) -->
+                    <div class="user-links flex-center gap-sm" style="display: none;">
+                        <span class="user-name text-secondary"></span>
+                        <button onclick="logout()" class="btn btn-outline btn-sm">Logout</button>
+                    </div>
+                    
+                    <!-- Mobile Menu Toggle -->
+                    <button class="navbar-toggle" style="display: none; background: none; border: none; font-size: 24px; cursor: pointer;">
+                        ☰
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" style="background: linear-gradient(135deg, #ff6b35 0%, #ff8c5a 100%); padding: var(--spacing-2xl) 0; color: white;">
+        <div class="container">
+            <div class="flex-between" style="align-items: center; gap: var(--spacing-2xl);">
+                <div class="hero-content" style="flex: 1;">
+                    <h1 style="color: white; margin-bottom: var(--spacing-md);">Delicious food, delivered to your door.</h1>
+                    <p style="color: rgba(255,255,255,0.9); font-size: var(--font-size-lg); margin-bottom: var(--spacing-xl);">Discover your favorite meals from the best restaurants around you.</p>
+                    <div class="hero-buttons flex gap-md">
+                        <a href="restaurants.html" class="btn btn-secondary btn-lg">Explore Restaurants</a>
+                        <a href="restaurants.html" class="btn btn-outline btn-lg" style="border-color: white; color: white;">View Offers</a>
+                    </div>
+                    <div class="badge badge-warning mt-lg" style="display: inline-block; background: rgba(255,255,255,0.2); color: white;">
+                        🎉 Free delivery on your first order
+                    </div>
+                </div>
+                <div class="hero-image" style="flex: 1; text-align: center;">
+                    <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=500&h=400&fit=crop" alt="Delicious Food" style="border-radius: var(--border-radius-lg); box-shadow: var(--shadow-xl); max-width: 100%;">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="section">
+        <div class="container">
+            <div class="section-title">
+                <h2>Food Categories</h2>
+                <p>Choose from a variety of cuisines</p>
+            </div>
+            <div class="categories-grid grid grid-4" id="categories-grid">
+                <!-- Categories will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Popular Restaurants -->
+    <section class="section" style="background-color: var(--bg-secondary);">
+        <div class="container">
+            <div class="section-title">
+                <h2>Popular Restaurants</h2>
+                <p>Top-rated restaurants near you</p>
+            </div>
+            <div class="restaurants-grid grid grid-4" id="restaurants-grid">
+                <!-- Restaurants will be loaded here -->
+            </div>
+            <div class="text-center mt-xl">
+                <a href="restaurants.html" class="btn btn-primary">View All Restaurants</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Popular Food -->
+    <section class="section">
+        <div class="container">
+            <div class="section-title">
+                <h2>Popular Food</h2>
+                <p>Most ordered dishes this week</p>
+            </div>
+            <div class="food-grid grid grid-4" id="food-grid">
+                <!-- Food items will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Special Offers -->
+    <section class="section" style="background: linear-gradient(135deg, #2d3436 0%, #636e72 100%); color: white;">
+        <div class="container">
+            <div class="section-title">
+                <h2 style="color: white;">Special Offers</h2>
+                <p style="color: rgba(255,255,255,0.8);">Limited time deals you don't want to miss</p>
+            </div>
+            <div class="offers-grid grid grid-3">
+                <div class="card" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">
+                    <div class="card-body text-center">
+                        <div style="font-size: 48px; font-weight: 700; color: var(--primary-color); margin-bottom: var(--spacing-sm);">20% OFF</div>
+                        <h3 style="color: white;">On your first order</h3>
+                        <p style="color: rgba(255,255,255,0.8);">Use code: WELCOME10</p>
+                        <a href="restaurants.html" class="btn btn-primary mt-md">Order Now</a>
+                    </div>
+                </div>
+                <div class="card" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">
+                    <div class="card-body text-center">
+                        <div style="font-size: 48px; font-weight: 700; color: var(--success-color); margin-bottom: var(--spacing-sm);">FREE</div>
+                        <h3 style="color: white;">Free Delivery</h3>
+                        <p style="color: rgba(255,255,255,0.8);">On selected restaurants</p>
+                        <a href="restaurants.html" class="btn btn-primary mt-md">Explore</a>
+                    </div>
+                </div>
+                <div class="card" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">
+                    <div class="card-body text-center">
+                        <div style="font-size: 48px; font-weight: 700; color: var(--warning-color); margin-bottom: var(--spacing-sm);">BOGO</div>
+                        <h3 style="color: white;">Buy 1 Get 1</h3>
+                        <p style="color: rgba(255,255,255,0.8);">On selected meals</p>
+                        <a href="restaurants.html" class="btn btn-primary mt-md">View Deals</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="section">
+        <div class="container">
+            <div class="section-title">
+                <h2>How It Works</h2>
+                <p>Get your food delivered in 4 easy steps</p>
+            </div>
+            <div class="steps-grid grid grid-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <div style="font-size: 48px; margin-bottom: var(--spacing-md);">🍽️</div>
+                        <h3>Choose</h3>
+                        <p>Find your favorite restaurant.</p>
+                    </div>
+                </div>
+                <div class="card text-center">
+                    <div class="card-body">
+                        <div style="font-size: 48px; margin-bottom: var(--spacing-md);">🍕</div>
+                        <h3>Pick</h3>
+                        <p>Choose your favorite meal.</p>
+                    </div>
+                </div>
+                <div class="card text-center">
+                    <div class="card-body">
+                        <div style="font-size: 48px; margin-bottom: var(--spacing-md);">🛒</div>
+                        <h3>Order</h3>
+                        <p>Add it to your cart and checkout.</p>
+                    </div>
+                </div>
+                <div class="card text-center">
+                    <div class="card-body">
+                        <div style="font-size: 48px; margin-bottom: var(--spacing-md);">🚀</div>
+                        <h3>Enjoy</h3>
+                        <p>Get your food delivered.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Customer Reviews -->
+    <section class="section" style="background-color: var(--bg-secondary);">
+        <div class="container">
+            <div class="section-title">
+                <h2>Customer Reviews</h2>
+                <p>What our customers say about us</p>
+            </div>
+            <div class="testimonials-grid grid grid-3" id="testimonials-grid">
+                <!-- Testimonials will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" style="background-color: var(--bg-dark); color: white; padding: var(--spacing-2xl) 0;">
+        <div class="container">
+            <div class="grid grid-4">
+                <div>
+                    <h3 style="color: white; margin-bottom: var(--spacing-md);">🍔 BiteRush</h3>
+                    <p style="color: rgba(255,255,255,0.7);">Your cravings. Delivered fast.</p>
+                    <div class="flex gap-sm mt-md">
+                        <a href="#" style="color: white; font-size: 20px;">📘</a>
+                        <a href="#" style="color: white; font-size: 20px;">🐦</a>
+                        <a href="#" style="color: white; font-size: 20px;">📷</a>
+                    </div>
+                </div>
+                <div>
+                    <h4 style="color: white; margin-bottom: var(--spacing-md);">Quick Links</h4>
+                    <ul style="list-style: none;">
+                        <li style="margin-bottom: var(--spacing-sm);"><a href="index.html" style="color: rgba(255,255,255,0.7);">Home</a></li>
+                        <li style="margin-bottom: var(--spacing-sm);"><a href="restaurants.html" style="color: rgba(255,255,255,0.7);">Restaurants</a></li>
+                        <li style="margin-bottom: var(--spacing-sm);"><a href="restaurants.html" style="color: rgba(255,255,255,0.7);">Offers</a></li>
+                        <li style="margin-bottom: var(--spacing-sm);"><a href="orders.html" style="color: rgba(255,255,255,0.7);">My Orders</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: white; margin-bottom: var(--spacing-md);">Support</h4>
+                    <ul style="list-style: none;">
+                        <li style="margin-bottom: var(--spacing-sm);"><a href="#" style="color: rgba(255,255,255,0.7);">Help Center</a></li>
+                        <li style="margin-bottom: var(--spacing-sm);"><a href="#" style="color: rgba(255,255,255,0.7);">Contact Us</a></li>
+                        <li style="margin-bottom: var(--spacing-sm);"><a href="#" style="color: rgba(255,255,255,0.7);">Privacy Policy</a></li>
+                        <li style="margin-bottom: var(--spacing-sm);"><a href="#" style="color: rgba(255,255,255,0.7);">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: white; margin-bottom: var(--spacing-md);">Newsletter</h4>
+                    <p style="color: rgba(255,255,255,0.7); margin-bottom: var(--spacing-md);">Subscribe for exclusive deals and updates.</p>
+                    <div class="flex gap-sm">
+                        <input type="email" placeholder="Enter your email" class="form-control" style="flex: 1;">
+                        <button class="btn btn-primary">Subscribe</button>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-xl pt-lg" style="border-top: 1px solid rgba(255,255,255,0.1);">
+                <p style="color: rgba(255,255,255,0.5);">&copy; 2026 BiteRush. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        // Homepage specific initialization
+        function initHomePage() {
+            renderCategories();
+            renderRestaurants();
+            renderPopularFood();
+            renderTestimonials();
+        }
+
+        function renderCategories() {
+            const grid = document.getElementById('categories-grid');
+            if (!grid) return;
+
+            grid.innerHTML = categories.map(category => `
+                <a href="restaurants.html?category=${category.name}" class="card category-card" style="text-decoration: none; display: block; cursor: pointer;">
+                    <div class="card-body text-center">
+                        <img src="${category.image}" alt="${category.name}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin: 0 auto var(--spacing-md);">
+                        <h4 style="color: var(--text-primary); margin-bottom: 0;">${category.name}</h4>
+                    </div>
+                </a>
+            `).join('');
+        }
+
+        function renderRestaurants() {
+            const grid = document.getElementById('restaurants-grid');
+            if (!grid) return;
+
+            // Show first 8 restaurants
+            const featuredRestaurants = restaurants.slice(0, 8);
+
+            grid.innerHTML = featuredRestaurants.map(restaurant => `
+                <div class="card">
+                    <div style="position: relative;">
+                        <img src="${restaurant.image}" alt="${restaurant.name}" style="width: 100%; height: 200px; object-fit: cover;">
+                        <button class="btn-favorite ${isFavorite(restaurant.id) ? 'active' : ''}" 
+                                onclick="event.preventDefault(); toggleFavorite(${restaurant.id}); this.classList.toggle('active');"
+                                style="position: absolute; top: var(--spacing-md); right: var(--spacing-md); background: white; border-radius: 50%; width: 40px; height: 40px;">
+                            ${isFavorite(restaurant.id) ? '♥' : '♡'}
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <h3 style="margin-bottom: var(--spacing-sm);">${restaurant.name}</h3>
+                        <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin-bottom: var(--spacing-md);">${restaurant.cuisine}</p>
+                        <div class="flex-between" style="margin-bottom: var(--spacing-sm);">
+                            <div class="rating">
+                                <span>★</span>
+                                <span class="rating-value">${restaurant.rating} (${restaurant.reviews})</span>
+                            </div>
+                            <span style="font-size: var(--font-size-sm); color: var(--text-secondary);">${restaurant.deliveryTime} min</span>
+                        </div>
+                        <div class="flex-between">
+                            <span class="price">${formatPrice(restaurant.deliveryFee)} delivery</span>
+                            <a href="restaurant.html?id=${restaurant.id}" class="btn btn-primary btn-sm">View Menu</a>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderPopularFood() {
+            const grid = document.getElementById('food-grid');
+            if (!grid) return;
+
+            // Show first 8 food items
+            const popularFood = foodItems.slice(0, 8);
+
+            grid.innerHTML = popularFood.map(food => {
+                const restaurant = restaurants.find(r => r.id === food.restaurantId);
+                return `
+                    <div class="card">
+                        <a href="food-details.html?id=${food.id}" style="text-decoration: none; display: block;">
+                            <img src="${food.image}" alt="${food.name}" style="width: 100%; height: 180px; object-fit: cover;">
+                        </a>
+                        <div class="card-body">
+                            <h4 style="margin-bottom: var(--spacing-xs);">${food.name}</h4>
+                            <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin-bottom: var(--spacing-sm);">${restaurant ? restaurant.name : ''}</p>
+                            <div class="rating" style="margin-bottom: var(--spacing-sm);">
+                                <span>★</span>
+                                <span class="rating-value">${food.rating}</span>
+                            </div>
+                            <div class="flex-between">
+                                <span class="price">${formatPrice(food.price)}</span>
+                                <button onclick="event.preventDefault(); quickAddToCart(${food.id})" class="btn btn-primary btn-sm">Add</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderTestimonials() {
+            const grid = document.getElementById('testimonials-grid');
+            if (!grid) return;
+
+            grid.innerHTML = testimonials.map(testimonial => `
+                <div class="card">
+                    <div class="card-body">
+                        <div class="flex-center gap-sm mb-md">
+                            <img src="${testimonial.avatar}" alt="${testimonial.name}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
+                            <div>
+                                <h4 style="margin-bottom: 0;">${testimonial.name}</h4>
+                                <div class="rating">
+                                    <span>${formatRating(testimonial.rating)}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p style="color: var(--text-secondary);">"${testimonial.review}"</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function quickAddToCart(foodId) {
+            const food = foodItems.find(f => f.id === foodId);
+            if (!food) return;
+
+            const restaurant = restaurants.find(r => r.id === food.restaurantId);
+            
+            const cartItem = {
+                id: food.id,
+                name: food.name,
+                restaurantId: food.restaurantId,
+                restaurantName: restaurant ? restaurant.name : '',
+                image: food.image,
+                price: food.price,
+                finalPrice: food.price,
+                quantity: 1,
+                selectedOptions: {
+                    size: food.options.size[0].name,
+                    addOns: []
+                }
+            };
+
+            addToCart(cartItem);
+        }
+    </script>
+</body>
+</html>

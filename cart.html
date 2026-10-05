@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - BiteRush</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="flex-between" style="padding: var(--spacing-md) 0;">
+                <a href="index.html" class="logo">
+                    <span style="font-size: 24px; font-weight: 700; color: var(--primary-color);">
+                        🍔 BiteRush
+                    </span>
+                </a>
+                
+                <div class="navbar-menu">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="restaurants.html" class="nav-link">Restaurants</a>
+                    <a href="restaurants.html" class="nav-link">Categories</a>
+                    <a href="restaurants.html" class="nav-link">Offers</a>
+                </div>
+                
+                <div class="flex-center gap-md">
+                    <a href="cart.html" class="btn btn-primary btn-sm position-relative">
+                        🛒
+                        <span class="cart-count badge badge-primary" style="position: absolute; top: -8px; right: -8px; display: none;">0</span>
+                    </a>
+                    
+                    <div class="auth-links flex-center gap-sm">
+                        <a href="login.html" class="btn btn-outline btn-sm">Login</a>
+                    </div>
+                    
+                    <div class="user-links flex-center gap-sm" style="display: none;">
+                        <span class="user-name text-secondary"></span>
+                        <button onclick="logout()" class="btn btn-outline btn-sm">Logout</button>
+                    </div>
+                    
+                    <button class="navbar-toggle" style="display: none; background: none; border: none; font-size: 24px; cursor: pointer;">
+                        ☰
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="section">
+        <div class="container">
+            <h1>Your Cart</h1>
+            
+            <div class="grid grid-2" style="gap: var(--spacing-xl);">
+               
+                <div>
+                    <div id="cart-items">
+                        
+                    </div>
+                    
+                   
+                    <div id="empty-cart" class="empty-state hidden">
+                        <div class="empty-state-icon">🛒</div>
+                        <h3 class="empty-state-title">Your cart is feeling lonely 😢</h3>
+                        <p class="empty-state-text">Add something delicious and your cart will be happy.</p>
+                        <a href="restaurants.html" class="btn btn-primary">Explore Restaurants</a>
+                    </div>
+                </div>
+                
+              
+                <div>
+                    <div class="card" id="order-summary">
+                        <div class="card-header">
+                            <h3>Order Summary</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="flex-between mb-sm">
+                                <span>Subtotal</span>
+                                <span id="subtotal">$0.00</span>
+                            </div>
+                            <div class="flex-between mb-sm">
+                                <span>Delivery Fee</span>
+                                <span id="delivery-fee">$0.00</span>
+                            </div>
+                            <div class="flex-between mb-sm">
+                                <span>Service Fee</span>
+                                <span id="service-fee">$0.00</span>
+                            </div>
+                            <div class="flex-between mb-sm">
+                                <span>Tax</span>
+                                <span id="tax">$0.00</span>
+                            </div>
+                            <div class="flex-between mb-sm" id="discount-row" style="display: none; color: var(--success-color);">
+                                <span>Discount</span>
+                                <span id="discount">-$0.00</span>
+                            </div>
+                            <hr style="margin: var(--spacing-md) 0; border: none; border-top: 1px solid var(--border-color);">
+                            <div class="flex-between mb-lg">
+                                <span style="font-size: var(--font-size-lg); font-weight: 700;">Total</span>
+                                <span class="price price-large" id="total">$0.00</span>
+                            </div>
+                            
+                          
+                            <div class="form-group">
+                                <label class="form-label">Coupon Code</label>
+                                <div class="flex gap-sm">
+                                    <input type="text" id="coupon-input" placeholder="Enter coupon code" class="form-control" style="flex: 1;">
+                                    <button onclick="applyCoupon()" class="btn btn-primary">Apply</button>
+                                </div>
+                                <p id="coupon-message" style="font-size: var(--font-size-sm); margin-top: var(--spacing-sm);"></p>
+                            </div>
+                            
+                            <a href="checkout.html" id="checkout-btn" class="btn btn-primary btn-block btn-lg">Proceed to Checkout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+   
+    <footer class="footer" style="background-color: var(--bg-dark); color: white; padding: var(--spacing-xl) 0;">
+        <div class="container">
+            <div class="text-center">
+                <p style="color: rgba(255,255,255,0.5);">&copy; 2026 BiteRush. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        let appliedCoupon = null;
+
+        function initCartPage() {
+         
+            appliedCoupon = getFromLocalStorage('biterush_applied_coupon', null);
+            if (appliedCoupon) {
+                document.getElementById('coupon-input').value = appliedCoupon.code;
+            }
+            renderCart();
+        }
+
+        function renderCart() {
+            const cart = getCart();
+            const cartItemsContainer = document.getElementById('cart-items');
+            const emptyCart = document.getElementById('empty-cart');
+            const orderSummary = document.getElementById('order-summary');
+            const checkoutBtn = document.getElementById('checkout-btn');
+
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = '';
+                emptyCart.classList.remove('hidden');
+                orderSummary.classList.add('hidden');
+                return;
+            }
+
+            emptyCart.classList.add('hidden');
+            orderSummary.classList.remove('hidden');
+
+            cartItemsContainer.innerHTML = cart.map((item, index) => `
+                <div class="card mb-md">
+                    <div class="card-body">
+                        <div class="flex gap-md" style="align-items: flex-start;">
+                            <img src="${item.image}" alt="${item.name}" style="width: 100px; height: 100px; object-fit: cover; border-radius: var(--border-radius-sm);">
+                            <div style="flex: 1;">
+                                <h4 style="margin-bottom: var(--spacing-xs);">${item.name}</h4>
+                                <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin-bottom: var(--spacing-sm);">${item.restaurantName}</p>
+                                
+                                ${item.selectedOptions.size ? `<p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin-bottom: var(--spacing-xs);">Size: ${item.selectedOptions.size}</p>` : ''}
+                                
+                                ${item.selectedOptions.addOns && item.selectedOptions.addOns.length > 0 ? `
+                                    <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin-bottom: var(--spacing-sm);">
+                                        Add-ons: ${item.selectedOptions.addOns.join(', ')}
+                                    </p>
+                                ` : ''}
+                                
+                                ${item.selectedOptions.specialInstructions ? `
+                                    <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin-bottom: var(--spacing-sm); font-style: italic;">
+                                        "${item.selectedOptions.specialInstructions}"
+                                    </p>
+                                ` : ''}
+                                
+                                <div class="flex-between" style="align-items: center;">
+                                    <div class="quantity-selector">
+                                        <button class="quantity-btn" onclick="updateCartItemQuantity(${index}, ${item.quantity - 1})">-</button>
+                                        <span class="quantity-value">${item.quantity}</span>
+                                        <button class="quantity-btn" onclick="updateCartItemQuantity(${index}, ${item.quantity + 1})">+</button>
+                                    </div>
+                                    <span class="price">${formatPrice(item.finalPrice * item.quantity)}</span>
+                                </div>
+                            </div>
+                            <button onclick="removeFromCartByIndex(${index})" class="btn btn-outline btn-sm" style="border-color: var(--danger-color); color: var(--danger-color);">Remove</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            updateOrderSummary();
+        }
+
+        function updateCartItemQuantity(index, quantity) {
+            if (quantity <= 0) {
+                removeFromCartByIndex(index);
+                return;
+            }
+            
+            const cart = getCart();
+            cart[index].quantity = quantity;
+            saveCart(cart);
+            renderCart();
+        }
+
+        function removeFromCartByIndex(index) {
+            const cart = getCart();
+            cart.splice(index, 1);
+            saveCart(cart);
+            renderCart();
+            showToast('Item removed from cart', 'success');
+        }
+
+        function updateOrderSummary() {
+            const cart = getCart();
+            const subtotal = cart.reduce((total, item) => total + (item.finalPrice * item.quantity), 0);
+            
+    
+            const restaurantIds = [...new Set(cart.map(item => item.restaurantId))];
+            let deliveryFee = 0;
+            restaurantIds.forEach(id => {
+                const restaurant = restaurants.find(r => r.id === id);
+                if (restaurant) {
+                    deliveryFee += restaurant.deliveryFee;
+                }
+            });
+            
+            const serviceFee = subtotal * 0.05; 
+            const tax = subtotal * 0.08; 
+            
+            let discount = 0;
+            if (appliedCoupon) {
+                if (appliedCoupon.type === 'percentage') {
+                    discount = subtotal * (appliedCoupon.value / 100);
+                } else if (appliedCoupon.type === 'fixed') {
+                    discount = appliedCoupon.value;
+                }
+            }
+            
+            const total = subtotal + deliveryFee + serviceFee + tax - discount;
+
+            document.getElementById('subtotal').textContent = formatPrice(subtotal);
+            document.getElementById('delivery-fee').textContent = formatPrice(deliveryFee);
+            document.getElementById('service-fee').textContent = formatPrice(serviceFee);
+            document.getElementById('tax').textContent = formatPrice(tax);
+            
+            const discountRow = document.getElementById('discount-row');
+            if (discount > 0) {
+                discountRow.style.display = 'flex';
+                document.getElementById('discount').textContent = '-' + formatPrice(discount);
+            } else {
+                discountRow.style.display = 'none';
+            }
+            
+            document.getElementById('total').textContent = formatPrice(total);
+        }
+
+        function applyCoupon() {
+            const couponCode = document.getElementById('coupon-input').value.trim();
+            const messageElement = document.getElementById('coupon-message');
+            
+            if (!couponCode) {
+                messageElement.textContent = 'Please enter a coupon code';
+                messageElement.style.color = 'var(--danger-color)';
+                return;
+            }
+
+            
+            if (appliedCoupon && appliedCoupon.code.toUpperCase() === couponCode.toUpperCase()) {
+                messageElement.textContent = 'This coupon is already applied';
+                messageElement.style.color = 'var(--danger-color)';
+                return;
+            }
+
+            const validation = validateCoupon(couponCode);
+            
+            if (!validation.valid) {
+                messageElement.textContent = validation.message;
+                messageElement.style.color = 'var(--danger-color)';
+                return;
+            }
+
+            appliedCoupon = validation.coupon;
+            saveToLocalStorage('biterush_applied_coupon', appliedCoupon);
+            messageElement.textContent = `Coupon applied: ${validation.coupon.description}`;
+            messageElement.style.color = 'var(--success-color)';
+            showToast('Coupon applied successfully!', 'success');
+            
+            updateOrderSummary();
+        }
+    </script>
+</body>
+</html>
